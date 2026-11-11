@@ -1,0 +1,5 @@
+# Lambda image dependencies (no FastAPI/uvicorn needed). Keep in sync with
+# ../requirements-serve.txt - model.bin must load with the same versions.
+numpy==2.5.4
+scikit-learn==1.9.1
+xgboost-cpu==3.4.1

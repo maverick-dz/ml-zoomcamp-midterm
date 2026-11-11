@@ -1,0 +1,16 @@
+.git
+.github
+.gitignore
+*.md
+notebook.ipynb
+train.py
+data/
+artifacts/
+tests/
+frontend/
+__pycache__/
+*.pyc
+venv/
+.venv/
+.ipynb_checkpoints/
+.pytest_cache/

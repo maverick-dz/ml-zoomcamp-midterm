@@ -1,0 +1,35 @@
+# AWS SAM template: Lambda (container image) + API Gateway.
+# Run from the repository root:
+#     sam build -t aws/template.yaml
+#     sam deploy --guided
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Diabetes Health Indicators predictor (Lambda container image + API Gateway)
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+
+Resources:
+  DiabetesPredictorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures: [x86_64]
+      Events:
+        Predict:
+          Type: Api
+          Properties: {Path: /predict, Method: post}
+        Health:
+          Type: Api
+          Properties: {Path: /health, Method: get}
+    Metadata:
+      Dockerfile: aws/Dockerfile
+      DockerContext: ..
+      DockerTag: latest
+
+Outputs:
+  DiabetesPredictorApi:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"

@@ -1,0 +1,23 @@
+# Development dependencies: training, notebook, tests.
+# Python >= 3.12.
+#
+#   python -m venv venv
+#   source venv/bin/activate        # Windows: venv\Scripts\activate
+#   pip install -r requirements.txt
+#
+# These pins match requirements-serve.txt (plain `xgboost` here instead of the
+# CPU-only `xgboost-cpu`, because it installs on every OS including macOS).
+numpy==2.5.4
+scikit-learn==1.9.1
+xgboost==3.4.1
+pandas==3.0.6
+matplotlib==3.11.2
+seaborn==0.13.2
+fastapi==0.162.4
+uvicorn==0.54.0
+pydantic==2.14.3
+pytest==9.2.0
+httpx==0.28.1
+# Only needed to open/run notebook.ipynb (not pinned; any recent version works)
+jupyterlab
+ipykernel

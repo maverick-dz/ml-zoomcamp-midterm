@@ -1,0 +1,15 @@
+# Runtime dependencies for the web service (used by the Dockerfile / Render / CI).
+# Slim on purpose: no pandas, matplotlib or Jupyter.
+# Versions are the ones model.bin was trained and tested with - a pickled
+# scikit-learn / XGBoost model must be loaded with the same versions.
+# Requires Python >= 3.12 (numpy 2.5 / scipy 1.18).
+#
+# xgboost-cpu is the CPU-only build of XGBoost (same `import xgboost`, a few MB
+# instead of ~150 MB). It ships Linux and Windows wheels; on macOS use the
+# development requirements.txt instead (plain xgboost).
+numpy==2.5.4
+scikit-learn==1.9.1
+xgboost-cpu==3.4.1
+fastapi==0.162.4
+uvicorn==0.54.0
+pydantic==2.14.3

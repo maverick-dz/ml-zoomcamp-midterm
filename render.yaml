@@ -1,0 +1,17 @@
+# Render Blueprint - deploys the FastAPI service from the Dockerfile.
+# In Render: New + > Blueprint > pick this repo. See README "Deploy" section.
+services:
+  - type: web
+    name: diabetes-predictor
+    runtime: docker
+    plan: free
+    region: frankfurt          # pick the region closest to you (oregon, ohio, virginia, frankfurt, singapore)
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit  # redeploy on every push to the connected branch
+    envVars:
+      # Lock CORS to your Cloudflare Pages site once you know its URL, e.g.
+      #   https://diabetes-predictor.pages.dev
+      # "*" is fine for a public demo API with no authentication.
+      - key: ALLOWED_ORIGINS
+        value: "*"

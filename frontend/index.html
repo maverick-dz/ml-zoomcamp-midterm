@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diabetes risk screening demo</title>
+<style>
+  :root {
+    --bg:#f6f8fa; --card:#fff; --text:#1f2933; --muted:#616e7c; --line:#d9e0e7;
+    --accent:#2a6f97; --ok:#2f855a; --warn:#c05621; --bad:#c53030;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12171d; --card:#1a2129; --text:#e4e9ee; --muted:#9aa7b4;
+            --line:#2c3743; --accent:#61a5c9; --ok:#68d391; --warn:#f6ad55; --bad:#fc8181; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+         background:var(--bg); color:var(--text); }
+  main { max-width:880px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { margin:0 0 4px; font-size:1.6rem; }
+  p.lead { margin:0 0 16px; color:var(--muted); }
+  .notice { border:1px solid var(--warn); border-radius:10px; padding:10px 14px;
+            margin-bottom:16px; font-size:.92rem; }
+  fieldset { background:var(--card); border:1px solid var(--line); border-radius:12px;
+             margin:0 0 14px; padding:12px 16px 16px; }
+  legend { padding:0 8px; font-weight:600; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px 16px; }
+  label { display:flex; flex-direction:column; gap:4px; font-size:.9rem; color:var(--muted); }
+  input, select, button { font:inherit; color:var(--text); background:var(--bg);
+        border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
+  button.primary { background:var(--accent); color:#fff; border:0; padding:12px 20px;
+        font-weight:600; cursor:pointer; }
+  button.primary:disabled { opacity:.6; cursor:wait; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  #status { font-size:.85rem; padding:3px 10px; border-radius:999px; border:1px solid var(--line); }
+  #status.up { color:var(--ok); border-color:var(--ok); }
+  #status.down { color:var(--bad); border-color:var(--bad); }
+  #result { display:none; background:var(--card); border:1px solid var(--line);
+            border-radius:12px; padding:16px; margin-top:16px; }
+  .big { font-size:2.2rem; font-weight:700; line-height:1.1; }
+  .bar { position:relative; height:14px; background:var(--line); border-radius:7px; margin:12px 0 6px; }
+  .bar > i { position:absolute; left:0; top:0; bottom:0; border-radius:7px; background:var(--accent); }
+  .bar > b { position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--text); }
+  .small { font-size:.85rem; color:var(--muted); }
+  details { margin-top:14px; } summary { cursor:pointer; color:var(--muted); }
+  pre { overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px; }
+  .err { color:var(--bad); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Diabetes risk screening demo</h1>
+  <p class="lead">Answer the survey-style questions below. A machine-learning model trained on the CDC BRFSS 2015
+     survey (253,680 respondents) estimates the probability of diabetes or pre-diabetes.</p>
+  <div class="notice"><strong>Not medical advice.</strong> This is an educational project trained on self-reported
+     survey data. It cannot diagnose diabetes. Talk to a healthcare professional about any health concern.</div>
+
+  <form id="form">
+    <fieldset><legend>About you</legend><div class="grid">
+      <label>Sex<select name="sex"><option value="0">Female</option><option value="1">Male</option></select></label>
+      <label>Age group<select name="age" id="age"></select></label>
+      <label>Education<select name="education" id="education"></select></label>
+      <label>Household income<select name="income" id="income"></select></label>
+    </div></fieldset>
+
+    <fieldset><legend>Body &amp; general health</legend><div class="grid">
+      <label>BMI (10 - 100)<input type="number" name="bmi" min="10" max="100" step="0.1" value="28" required></label>
+      <label>General health<select name="genhlth">
+        <option value="1">1 - Excellent</option><option value="2">2 - Very good</option>
+        <option value="3" selected>3 - Good</option><option value="4">4 - Fair</option><option value="5">5 - Poor</option></select></label>
+      <label>Days of poor physical health (past 30)<input type="number" name="physhlth" min="0" max="30" step="1" value="0" required></label>
+      <label>Days of poor mental health (past 30)<input type="number" name="menthlth" min="0" max="30" step="1" value="0" required></label>
+    </div></fieldset>
+
+    <fieldset><legend>Health conditions</legend><div class="grid" id="conditions"></div></fieldset>
+    <fieldset><legend>Lifestyle</legend><div class="grid" id="lifestyle"></div></fieldset>
+    <fieldset><legend>Health-care access</legend><div class="grid" id="access"></div></fieldset>
+
+    <div class="row">
+      <button class="primary" id="go" type="submit">Estimate risk</button>
+      <span id="status">checking API...</span>
+    </div>
+  </form>
+
+  <div id="result" aria-live="polite"></div>
+
+  <details>
+    <summary>API settings</summary>
+    <div class="row" style="margin-top:8px">
+      <label style="flex:1;min-width:260px">API base URL
+        <input id="api" type="url" placeholder="https://your-service.onrender.com"></label>
+      <button type="button" id="save">Save &amp; re-check</button>
+    </div>
+    <p class="small">The API runs on Render's free plan, which sleeps after 15 minutes without traffic.
+       The first request after a pause can take up to a minute while it wakes up.</p>
+  </details>
+</main>
+
+<script src="config.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const yesNo = [["0","No"],["1","Yes"]];
+
+const AGE = ["18-24","25-29","30-34","35-39","40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80 or older"];
+const EDU = ["Never attended / kindergarten only","Grades 1-8","Grades 9-11 (some high school)",
+             "Grade 12 or GED (high school graduate)","College 1-3 years (some college)","College 4+ years (graduate)"];
+const INC = ["Under $10,000","$10,000-$14,999","$15,000-$19,999","$20,000-$24,999",
+             "$25,000-$34,999","$35,000-$49,999","$50,000-$74,999","$75,000 or more"];
+const fill = (id, arr, sel) => { $(id).innerHTML = arr.map((t,i) =>
+  `<option value="${i+1}" ${i+1===sel?"selected":""}>${t}</option>`).join(""); };
+fill("#age", AGE, 9); fill("#education", EDU, 4); fill("#income", INC, 3);
+
+const BOOLS = {
+  conditions: [["highbp","High blood pressure",0],["highchol","High cholesterol",0],
+    ["cholcheck","Cholesterol checked in the last 5 years",1],["stroke","Ever had a stroke",0],
+    ["heartdiseaseorattack","Coronary heart disease or heart attack",0],
+    ["diffwalk","Serious difficulty walking or climbing stairs",0]],
+  lifestyle: [["smoker","Smoked 100+ cigarettes in your life",0],
+    ["physactivity","Physical activity in past 30 days (outside work)",1],
+    ["fruits","Eat fruit at least once a day",1],["veggies","Eat vegetables at least once a day",1],
+    ["hvyalcoholconsump","Heavy drinker (men >14 / women >7 drinks per week)",0]],
+  access: [["anyhealthcare","Have any health-care coverage",1],
+    ["nodocbccost","Skipped seeing a doctor because of cost (past 12 months)",0]],
+};
+for (const [group, items] of Object.entries(BOOLS)) {
+  $("#" + group).innerHTML = items.map(([name, label, def]) =>
+    `<label>${label}<select name="${name}">` +
+    yesNo.map(([v,t]) => `<option value="${v}" ${+v===def?"selected":""}>${t}</option>`).join("") +
+    `</select></label>`).join("");
+}
+
+// ---- API base URL handling ----------------------------------------------
+function getApi() {
+  let saved = null;
+  try { saved = localStorage.getItem("diabetes_api_url"); } catch (e) {}
+  return (saved || window.API_URL || "").replace(/\/+$/, "");
+}
+$("#api").value = getApi();
+
+async function checkApi() {
+  const el = $("#status"); const base = getApi();
+  el.className = ""; el.textContent = "checking API...";
+  if (!base) { el.className = "down"; el.textContent = "no API URL set"; return; }
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 90000);
+    const r = await fetch(base + "/health", { signal: ctl.signal }); clearTimeout(t);
+    if (!r.ok) throw new Error(r.status);
+    el.className = "up"; el.textContent = "API online";
+  } catch (e) { el.className = "down"; el.textContent = "API unreachable"; }
+}
+$("#save").onclick = () => {
+  try { localStorage.setItem("diabetes_api_url", $("#api").value.trim()); } catch (e) {}
+  checkApi();
+};
+checkApi();   // also wakes a sleeping Render instance as soon as the page opens
+
+// ---- Prediction ------------------------------------------------------------
+$("#form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const out = $("#result"), btn = $("#go"), base = getApi();
+  const payload = {};
+  for (const [k, v] of new FormData(ev.target).entries()) payload[k] = Number(v);
+
+  out.style.display = "block";
+  out.innerHTML = `<span class="small">Contacting the API (a sleeping server can take up to a minute)...</span>`;
+  btn.disabled = true;
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 90000);
+    const r = await fetch(base + "/predict", { method: "POST", signal: ctl.signal,
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    clearTimeout(t);
+    const data = await r.json();
+    if (!r.ok) throw new Error(JSON.stringify(data.detail || data));
+    render(data);
+    $("#status").className = "up"; $("#status").textContent = "API online";
+  } catch (e) {
+    out.innerHTML = `<p class="err"><strong>Could not get a prediction.</strong> ${String(e.message || e)}</p>
+      <p class="small">Check the API URL under "API settings" and that the service is running.</p>`;
+  } finally { btn.disabled = false; }
+});
+
+function render(d) {
+  const pct = (d.diabetes_probability * 100).toFixed(1);
+  const above = d.diabetes_prediction === 1;
+  const verdict = above
+    ? `<span style="color:var(--warn)">Above the screening threshold</span> - a confirmatory test (e.g. HbA1c) would be worth discussing with a clinician.`
+    : `<span style="color:var(--ok)">Below the screening threshold</span> - lower estimated risk than the screening cut-off.`;
+  $("#result").innerHTML = `
+    <div class="small">Estimated probability of diabetes / pre-diabetes</div>
+    <div class="big">${pct}%</div>
+    <div class="bar"><i style="width:${Math.min(100, pct)}%"></i><b style="left:${(d.threshold*100).toFixed(1)}%"></b></div>
+    <div class="small">Black marker = screening threshold (${(d.threshold*100).toFixed(1)}%), chosen so the model catches about 80% of true cases.
+      For reference, about 15% of respondents in the training data had diabetes or pre-diabetes.</div>
+    <p>${verdict}</p>
+    <p class="small">Model: ${d.model}. Educational demo - not a diagnosis.</p>
+    <details><summary>Raw API response</summary><pre>${JSON.stringify(d, null, 2)}</pre></details>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+{
+  "model": "xgboost_tuned",
+  "best_params": {
+    "subsample": 0.7,
+    "reg_lambda": 1,
+    "n_estimators": 300,
+    "min_child_weight": 1,
+    "max_depth": 6,
+    "learning_rate": 0.03,
+    "colsample_bytree": 0.8
+  },
+  "target_recall": 0.8,
+  "threshold": 0.1516042947769165,
+  "data": {
+    "rows_raw": 253680,
+    "duplicates_removed": 24206,
+    "rows_used": 229474,
+    "positive_rate": 0.1529454317264701,
+    "split": {
+      "train": 137684,
+      "val": 45895,
+      "test": 45895,
+      "full": 183579
+    }
+  },
+  "test_metrics": {
+    "roc_auc": 0.8198787939240544,
+    "average_precision": 0.4444417502031035,
+    "brier_raw": 0.1045469120144844,
+    "brier_calibrated": 0.10460638999938965,
+    "at_threshold": {
+      "threshold": 0.1516042947769165,
+      "accuracy": 0.6931474016777427,
+      "precision": 0.30916360492759887,
+      "recall": 0.8152158427126371,
+      "specificity": 0.6711081386973968,
+      "f1": 0.44830963293767384,
+      "tn": 26090,
+      "fp": 12786,
+      "fn": 1297,
+      "tp": 5722
+    }
+  },
+  "threshold_table": [
+    {
+      "target_recall_on_train_val": 0.7,
+      "threshold": 0.18925784528255463,
+      "accuracy": 0.7438936703344591,
+      "precision": 0.3420297591245746,
+      "recall": 0.7303034620316284,
+      "specificity": 0.7463473608395925,
+      "f1": 0.4658729437426157,
+      "tn": 29015,
+      "fp": 9861,
+      "fn": 1893,
+      "tp": 5126
+    },
+    {
+      "target_recall_on_train_val": 0.8,
+      "threshold": 0.1516042947769165,
+      "accuracy": 0.6931474016777427,
+      "precision": 0.30916360492759887,
+      "recall": 0.8152158427126371,
+      "specificity": 0.6711081386973968,
+      "f1": 0.44830963293767384,
+      "tn": 26090,
+      "fp": 12786,
+      "fn": 1297,
+      "tp": 5722
+    },
+    {
+      "target_recall_on_train_val": 0.9,
+      "threshold": 0.0920502096414566,
+      "accuracy": 0.5964484148600065,
+      "precision": 0.2627279478504827,
+      "recall": 0.907251745262858,
+      "specificity": 0.5403333676304146,
+      "f1": 0.40746072879674955,
+      "tn": 21006,
+      "fp": 17870,
+      "fn": 651,
+      "tp": 6368
+    }
+  ],
+  "all_model_results": [
+    {
+      "model": "xgboost_tuned",
+      "val_auc": 0.81688,
+      "val_avg_precision": 0.44317,
+      "val_brier": 0.10514,
+      "val_precision_at_recall80": 0.30822,
+      "fit_seconds": 131.2,
+      "cv_auc_mean": 0.81487,
+      "cv_auc_std": 0.00224,
+      "cv_folds": 5.0,
+      "search_iterations": 10.0
+    },
+    {
+      "model": "xgboost_default",
+      "val_auc": 0.81469,
+      "val_avg_precision": 0.43876,
+      "val_brier": 0.10559,
+      "val_precision_at_recall80": 0.30597,
+      "fit_seconds": 2.3,
+      "cv_auc_mean": NaN,
+      "cv_auc_std": NaN,
+      "cv_folds": NaN,
+      "search_iterations": NaN
+    },
+    {
+      "model": "random_forest_tuned",
+      "val_auc": 0.8132,
+      "val_avg_precision": 0.43723,
+      "val_brier": 0.1061,
+      "val_precision_at_recall80": 0.30211,
+      "fit_seconds": 58.5,
+      "cv_auc_mean": 0.80976,
+      "cv_auc_std": 0.00101,
+      "cv_folds": 3.0,
+      "search_iterations": 4.0
+    },
+    {
+      "model": "random_forest",
+      "val_auc": 0.8119,
+      "val_avg_precision": 0.43348,
+      "val_brier": 0.10651,
+      "val_precision_at_recall80": 0.3044,
+      "fit_seconds": 6.3,
+      "cv_auc_mean": NaN,
+      "cv_auc_std": NaN,
+      "cv_folds": NaN,
+      "search_iterations": NaN
+    },
+    {
+      "model": "logreg",
+      "val_auc": 0.80876,
+      "val_avg_precision": 0.41116,
+      "val_brier": 0.10768,
+      "val_precision_at_recall80": 0.30457,
+      "fit_seconds": 0.2,
+      "cv_auc_mean": NaN,
+      "cv_auc_std": NaN,
+      "cv_folds": NaN,
+      "search_iterations": NaN
+    },
+    {
+      "model": "decision_tree",
+      "val_auc": 0.79614,
+      "val_avg_precision": 0.39938,
+      "val_brier": 0.10849,
+      "val_precision_at_recall80": 0.28817,
+      "fit_seconds": 0.2,
+      "cv_auc_mean": NaN,
+      "cv_auc_std": NaN,
+      "cv_folds": NaN,
+      "search_iterations": NaN
+    }
+  ],
+  "versions": {
+    "python": "3.12.3",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "numpy": "2.5.4"
+  },
+  "random_state": 42,
+  "trained_at": "2026-11-10T20:22:57+00:00",
+  "quick_run": false
+}

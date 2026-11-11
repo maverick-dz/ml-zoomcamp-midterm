@@ -1,0 +1,23 @@
+{
+  "highbp": 1,
+  "highchol": 1,
+  "cholcheck": 1,
+  "bmi": 28.0,
+  "smoker": 1,
+  "stroke": 0,
+  "heartdiseaseorattack": 0,
+  "physactivity": 0,
+  "fruits": 0,
+  "veggies": 1,
+  "hvyalcoholconsump": 0,
+  "anyhealthcare": 1,
+  "nodocbccost": 0,
+  "genhlth": 3,
+  "menthlth": 0,
+  "physhlth": 0,
+  "diffwalk": 0,
+  "sex": 0,
+  "age": 9,
+  "education": 4,
+  "income": 3
+}
