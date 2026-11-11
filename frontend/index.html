@@ -84,16 +84,6 @@
 
   <div id="result" aria-live="polite"></div>
 
-  <details>
-    <summary>API settings</summary>
-    <div class="row" style="margin-top:8px">
-      <label style="flex:1;min-width:260px">API base URL
-        <input id="api" type="url" placeholder="https://your-service.onrender.com"></label>
-      <button type="button" id="save">Save &amp; re-check</button>
-    </div>
-    <p class="small">The API runs on Render's free plan, which sleeps after 15 minutes without traffic.
-       The first request after a pause can take up to a minute while it wakes up.</p>
-  </details>
 </main>
 
 <script src="config.js"></script>
@@ -131,11 +121,8 @@ for (const [group, items] of Object.entries(BOOLS)) {
 
 // ---- API base URL handling ----------------------------------------------
 function getApi() {
-  let saved = null;
-  try { saved = localStorage.getItem("diabetes_api_url"); } catch (e) {}
-  return (saved || window.API_URL || "").replace(/\/+$/, "");
+  return (window.API_URL || "").replace(/\/+$/, "");
 }
-$("#api").value = getApi();
 
 async function checkApi() {
   const el = $("#status"); const base = getApi();
@@ -148,10 +135,7 @@ async function checkApi() {
     el.className = "up"; el.textContent = "API online";
   } catch (e) { el.className = "down"; el.textContent = "API unreachable"; }
 }
-$("#save").onclick = () => {
-  try { localStorage.setItem("diabetes_api_url", $("#api").value.trim()); } catch (e) {}
-  checkApi();
-};
+
 checkApi();   // also wakes a sleeping Render instance as soon as the page opens
 
 // ---- Prediction ------------------------------------------------------------
@@ -175,7 +159,7 @@ $("#form").addEventListener("submit", async (ev) => {
     $("#status").className = "up"; $("#status").textContent = "API online";
   } catch (e) {
     out.innerHTML = `<p class="err"><strong>Could not get a prediction.</strong> ${String(e.message || e)}</p>
-      <p class="small">Check the API URL under "API settings" and that the service is running.</p>`;
+      <p class="small">Check that the API service is running; it may be waking up.</p>`;
   } finally { btn.disabled = false; }
 });
 
